@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env Rscript
 
 ####################################################
 ## FINAL TAXONOMY/RA FILE (IN R)
