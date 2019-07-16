@@ -3,11 +3,11 @@ DIAMOND + MEGAN pipeline for Nanopore MinION metagenome data.
 
 ## 0. SOFTWARE REQUIREMENTS:
 For the correct functioning of this scripts, the installation of several software is required:
-..- **prinseq-lite**: https://sourceforge.net/projects/prinseq/files/standalone/
-..- **DIAMOND**: Currently available at CESGA server modules
-..- **MEGAN6**: http://ab.inf.uni-tuebingen.de/software/megan6/
-..- **SPARCC**: Inside a .conda environment. https://bitbucket.org/yonatanf/sparcc/src/default/
-..- **R**: With packages tidyr and PCIT
+- **prinseq-lite**: https://sourceforge.net/projects/prinseq/files/standalone/
+- **DIAMOND**: Currently available at CESGA server modules
+- **MEGAN6**: http://ab.inf.uni-tuebingen.de/software/megan6/
+- **SPARCC**: Inside a .conda environment. https://bitbucket.org/yonatanf/sparcc/src/default/
+- **R**: With packages tidyr and PCIT
 
 ## 1. Script execution:
 a) Use `sh MinION_MEGAN.sh -h`  
