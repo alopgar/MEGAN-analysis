@@ -28,6 +28,4 @@ We recommend executing in console (`sh MinION_MEGAN_finalprocessing.sh`), as thi
 
 ## 4. SPARCC and networks files:
 - **_Input_**: .txt (tsv) table formatted in **R** from `rma_taxa_count_filtered.csv`
-- **_Output_**: Correlation matrix
-
-After, R processing of the correlation matrix is performed in order to get an edgelist for cytoscape or other network software.
+- **_Output_**: Correlation matrix. After, R processing of the correlation matrix is performed in order to get an edgelist for cytoscape or other network software.
