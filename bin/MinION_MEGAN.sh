@@ -56,6 +56,7 @@ while true; do
 	esac
 done
 
+if [ ! -d $PTH_data ];then mkdir -p $PTH_data; fi
 if [ ! -d $WDIR/1_Rawdata ];then mkdir -p $WDIR/1_Rawdata; fi
 
 ####################################################################
@@ -64,32 +65,33 @@ if [ ! -d $WDIR/1_Rawdata ];then mkdir -p $WDIR/1_Rawdata; fi
 
 ## START: IDs FILE & LINKS TO INPUT FILES (if parameter 'ini' specified)
 export IDfile=$WDIR/INP_files.txt
-export Input=$(awk '{ print $1 }' $IDfile)
 
 if [ "$ini" == 1 ]; then
 	echo "INI"
-	if [ -f $WDIR/INP_files_all.txt ];then mv $WDIR/INP_files_all.txt $WDIR/INP_files_done.txt; fi
-	ls $PTH/* | xargs -n1 basename | awk '{gsub(".fastq",""); gsub(".gz",""); print }' > $WDIR/INP_files_all.txt
+	if [ -f $WDIR/INP_files_all.txt ]; then mv $WDIR/INP_files_all.txt $WDIR/INP_files_done.txt
+	else touch $WDIR/INP_files_done.txt; fi
+	ls $PTH/*fastq* | xargs -n1 basename | awk '{gsub(".fastq",""); gsub(".gz",""); print }' > $WDIR/INP_files_all.txt
 	diff $WDIR/INP_files_all.txt $WDIR/INP_files_done.txt | grep '<' | sed 's/<\ //' > $WDIR/INP_files.txt
+	export Input=$(awk '{ print $1 }' $IDfile)
 	for f in $Input; do
 		cp $PTH/$f* $PTH_data
 		if [ -f $PTH_data/$f.fastq.gz ]; then gunzip $PTH_data/$f.fastq.gz; fi
 		ln -s $PTH_data/$f.fastq $WDIR/1_Rawdata
 	done
-fi
+else export Input=$(awk '{ print $1 }' $IDfile) fi
 
 ## TRIMMING FOLDERS:
 if [ ! -d $WDIR/1_Rawdata/trim_bad ];then mkdir $WDIR/1_Rawdata/trim_bad; fi
 if [ ! -d $WDIR/1_Rawdata/trim_logs ];then mkdir $WDIR/1_Rawdata/trim_logs; fi
 
 ## EXE:
-if ["$final" == 0 ]; then
+if [ "$final" == 0 ]; then
 	for file in $Input; do
-		sbatch ./bin/MinION_MEGAN_run.sh $file
+		sbatch MinION_MEGAN_run.sh $file
 	done
 fi
 
 ## FINALSTATS:
-if ["$final" == 1 ]; then
-	sbatch ./bin/MinION_MEGAN_finalstats.sh
+if [ "$final" == 1 ]; then
+	sbatch MinION_MEGAN_finalstats.sh
 fi
