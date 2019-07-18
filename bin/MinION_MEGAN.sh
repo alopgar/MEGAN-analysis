@@ -78,7 +78,7 @@ if [ "$ini" == 1 ]; then
 		if [ -f $PTH_data/$f.fastq.gz ]; then gunzip $PTH_data/$f.fastq.gz; fi
 		ln -s $PTH_data/$f.fastq $WDIR/1_Rawdata
 	done
-else export Input=$(awk '{ print $1 }' $IDfile) fi
+else export Input=$(awk '{ print $1 }' $IDfile); fi
 
 ## TRIMMING FOLDERS:
 if [ ! -d $WDIR/1_Rawdata/trim_bad ];then mkdir $WDIR/1_Rawdata/trim_bad; fi
