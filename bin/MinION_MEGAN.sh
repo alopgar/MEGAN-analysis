@@ -15,14 +15,13 @@ $(basename "$0") [PATHS]... [OPTIONS]... -- Initiates a pipeline for Nanopore Mi
 	-i, --init:\n
 	\tThis flag indicates that initial files and configs must be prepared in output dir. If NOT SPECIFIED, NO FASTQ SYMLINKS nor ID FILE CREATION\n
 	\twill be done.\n
-	-F, --final:\n
-	\tThis flag enables the use of .log files for creating final stats files:\n
-	\t\t-Trimming stats (Prinseq-lite)\n
-	\t\t-Running time for DIAMOND files\n
-	\t\t-Running time for MEGAN files\n
-	\tIf this flag is indicated, DIAMOND + MEGAN processing will NOT be done.\n
 	-t, --tempdir:\n
 	\tCustomize temp directory where input data will be copied and unzipped.If NOT SPECIFIED, input data will be copied in [Input_path]/temp.\n 
+	-P, --process:\n
+	\tThis flag allows to select which pipeline steps will be carried out. Possible values are:\n
+	\t\t-"PDM": Prinseq-Lite + DIAMOND + MEGAN (Default).\n
+	\t\t-"DM": DIAMOND + MEGAN.\n
+	\t\t-"M": MEGAN only.\n
 	-h, --help:\n
 	\tPrints this screen.\n
 _EUs_
@@ -38,23 +37,24 @@ export DMND=$LUSTRE/NCBI_db/nr.dmnd
 export MEGAN_a2t=$LUSTRE/NCBI_db/prot_acc2tax-May2017.abin
 export MEGAN_ip2g=$LUSTRE/NCBI_db/acc2interpro-Nov2016XX.abin
 
+export proc="PDM"
+ini=
+
 export PTH=$1
 export PTH_data=$PTH/temp
 export WDIR=$2; shift 2
-ini=
-final=0
 
-OPTS=`getopt -o iFt:h --long init,final,tempdir:,help -- "$@"`
+OPTS=`getopt -o it:P:h --long init,tempdir:,process:,help -- "$@"`
 eval set -- "$OPTS"
 
 while true; do
 	case $1 in
 		-i | --init)
 			ini=1; shift ;;
-		-F | --final)
-			final=1; shift ;;
 		-t | --tempdir)
 			export PTH_data=$2; shift 2 ;;
+		-P | --process)
+			export proc=$2; shift 2 ;;
 		-h | --help)
 			echo -e $(usage) | less ; exit ;;
 		--) shift ; break ;;
@@ -91,7 +91,7 @@ if [ "$ini" == 1 ]; then
 			then gunzip $PTH_data/$f.fastq.gz
 		fi
 		ln -s $PTH_data/$f.fastq $WDIR/1_Rawdata
-		echo "Copying done --- Symlink created in 1_Rawdata"
+		echo -e "Copying done --- Symlink created in 1_Rawdata\n"
 	done
 else export Input=$(awk '{ print $1 }' $IDfile); fi
 
@@ -105,13 +105,6 @@ if [ ! -d $WDIR/3_files.rma ];then mkdir $WDIR/3_files.rma; fi
 if [ ! -d $WDIR/4_files.rmainfo ];then mkdir $WDIR/4_files.rmainfo; fi
 
 ## EXE:
-if [ "$final" == 0 ]; then
-	for file in $Input; do
-		sbatch ./bin/MinION_MEGAN/MinION_MEGAN_run.sh $file
-	done
-fi
-
-## FINALSTATS:
-if [ "$final" == 1 ]; then
-	sh ./bin/MinION_MEGAN/MinION_MEGAN_finalstats.sh
-fi
+for file in $Input; do
+	sh ./bin/MinION_MEGAN/MinION_MEGAN_run.sh $file
+done
