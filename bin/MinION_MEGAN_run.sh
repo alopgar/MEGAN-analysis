@@ -9,41 +9,37 @@
 ## No indicamos sbatch --mem=40GB porque estamos pidiendo un nodo de thinnodes,cola-corta en exclusiva (120GB). Dejamos que use toda la memoria.
 ## Default time: 10h
 
-echo -e "DIAMOND + MEGAN pipeline for Nanopore MinION metagenome sequencing.
+echo -e "\nDIAMOND + MEGAN pipeline for Nanopore MinION metagenome sequencing.
 Project: $WDIR
 Analyzing sample "$(awk '/'$1'/{ print NR; }' $IDfile)" of "$(< $IDfile wc -l)".
-Input file: $1.fastq"
+Input file: $1.fastq
+------------------------"
 
 ####################################################################
 # PRINSEQ for quality & length trimming
 ####################################################################
-module load perl
-perl $PRINSEQDIR/prinseq-lite.pl -fastq $WDIR/1_Rawdata/$1.fastq -min_qual_mean 7 -min_len 300 \
-	-out_good $WDIR/1_Rawdata/$1"_trim" -out_bad $WDIR/1_Rawdata/trim_bad/$1"_bad" -log $WDIR/1_Rawdata/trim_logs/$1.log
-
-# After trimming, remove temp .fastq file and symlink:
-if [ -f $WDIR/1_Rawdata/$1"_trim".fastq ]; then
-	if [ -f $PTH_data/$1.fastq ]; then rm $PTH_data/$1.fastq; fi
-	if [ -f $WDIR/1_Rawdata/$1.fastq ]; then rm $WDIR/1_Rawdata/$1.fastq; fi
-	if [ -d $PTH_data ]; then rmdir $PTH_data; fi
-else
-	echo "TRIMMING ERROR"
+if [ $proc == "PDM" ]; then
+	if [ -f $WDIR/1_Rawdata/trim_logs/$1.log ]; then rm $WDIR/1_Rawdata/trim_logs/$1.log; fi
+	module load perl
+	perl $PRINSEQDIR/prinseq-lite.pl -fastq $WDIR/1_Rawdata/$1.fastq -min_qual_mean 7 -min_len 300 \
+		-out_good $WDIR/1_Rawdata/$1"_trim" -out_bad $WDIR/1_Rawdata/trim_bad/$1"_bad" -log $WDIR/1_Rawdata/trim_logs/$1.log
 fi
 
 ####################################################################
 # DIAMOND for .fastq to .daa converting 
 ####################################################################
-module load gcc/6.4.0 diamond/0.9.22
-
 ##OPTIONS:
 ## blastx is the alignment option
 ## -query points to the file to convert
 ## -db is database (instructions to get this ask Bea)
 ## -daa output file
 ## -F 15 (to consider frameshift errors from Nanopore reads)
-## -range-culling --top 10 (consider only alignments with a bitscore in the best 10% bit score)
+## -range-culling --top 10 (consider only alignments with a bitscore in the best 10% bit score
 
-diamond blastx -F 15 --range-culling --top 10 --query $WDIR/1_Rawdata/$1"_trim.fastq" --db $DMND --daa $WDIR/2_files.daa/$1"_trim.daa"
+if [ $proc == "PDM" ] || [ $proc == "DM" ]; then
+	module load gcc/6.4.0 diamond/0.9.22
+	diamond blastx -F 15 --range-culling --top 10 --query $WDIR/1_Rawdata/$1"_trim.fastq" --db $DMND --daa $WDIR/2_files.daa/$1"_trim.daa"
+fi
 
 ####################################################################
 # MEGAN for .daa to .rma converting
@@ -58,14 +54,17 @@ diamond blastx -F 15 --range-culling --top 10 --query $WDIR/1_Rawdata/$1"_trim.f
 ## -ram				Set the read assignment mode. Default value: readCount. Legal values: readCount, readLength, alignedBases, readMagnitude
 ## -ms				Min score. Default value: 50.0.
 
-$MEGANDIR/tools/daa2rma -i $WDIR/2_files.daa/$1"_trim.daa" -o $WDIR/3_files.rma/$1"_trim.rma" -lg -alg longReads -a2t $MEGAN_a2t -a2interpro2go $MEGAN_ip2g
+if [ $proc == "PDM" ] || [ $proc == "DM" ] || [ $proc == "M" ]; then
+	$MEGANDIR/tools/daa2rma -i $WDIR/2_files.daa/$1"_trim.daa" -o $WDIR/3_files.rma/$1"_trim.rma" -lg -alg longReads -a2t $MEGAN_a2t -a2interpro2go $MEGAN_ip2g
+fi
 
 ####################################################################
 # MEGAN for taking taxonomic & functional info from .rma
 ####################################################################
-#Converts rma file into a readable file with taxonomy and number of reads per taxon.
-$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -c2c Taxonomy -p -r -mro > $WDIR/4_files.rmainfo/$1"_trim.rma.RA.txt"
-
-#Converts rma file into a readable file with Interpro2go functional info per read (2nd line is for taxonomy of each read)
-$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -r2c INTERPRO2GO -p > $WDIR/4_files.rmainfo/$1"_trim.rma.IP2G.txt"
-$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -r2c Taxonomy -p -r -mro > $WDIR/4_files.rmainfo/$1"_trim.rma.readtotax.txt"
+if [ $proc == "PDM" ] || [ $proc == "DM" ] || [ $proc == "M" ]; then
+	#Converts rma file into a readable file with taxonomy and number of reads per taxon.
+	$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -c2c Taxonomy -p -r -mro > $WDIR/4_files.rmainfo/$1"_trim.rma.RA.txt"
+	#Converts rma file into a readable file with Interpro2go functional info per read (2nd line is for taxonomy of each read)
+	$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -r2c INTERPRO2GO -p > $WDIR/4_files.rmainfo/$1"_trim.rma.IP2G.txt"
+	$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -r2c Taxonomy -p -r -mro > $WDIR/4_files.rmainfo/$1"_trim.rma.readtotax.txt"
+fi
