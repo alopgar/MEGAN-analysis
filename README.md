@@ -15,7 +15,7 @@ b) Change variable paths inside `MinION_MEGAN.sh`
 c) Use `sbatch MinION_MEGAN.sh [Input_path] [Output_path] -i` for running the script. Other options are available.  
 
 ## 2. Getting trimming and performance statistics:
-a) Use `sh MinION_MEGAN_finalstats.sh -h` for more information.
+a) Use `sh MinION_MEGAN_finalstats.sh -h` for more information.  
 b) Use `sbatch MinION_MEGAN_finalstats.sh [Project_dir]`for running the script.  
 c) Output: All files will be stored in the specified project directory (normally the `[Output_path]` used for `MinION_MEGAN.sh` run).  
 - `Minion_trim.tsv` -> Trimming summary
