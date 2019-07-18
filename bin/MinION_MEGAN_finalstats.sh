@@ -5,12 +5,6 @@
 ## FINAL STATS FILES
 ####################################################
 ## STATS FOR TRIMMING WITH PRINSEQ-LITE:
-for i in $(grep -l 'ERROR' $WDIR/1_Rawdata/trim_logs/*.log); do
-	grep -vwE 'ERROR:' $i > tmp.log
-	mv tmp.log $i
-done
-rm tmp.log
-
 for i in $(ls $WDIR/1_Rawdata/trim_logs/*.log); do
 	echo $i | xargs -n1 basename > Trimcol.tmp
 	awk -F': ' 'FNR>=4 && FNR<=12 {print $2}' $i >> Trimcol.tmp
