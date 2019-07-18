@@ -10,13 +10,14 @@ For the correct functioning of this scripts, the installation of several softwar
 - **R**: With packages tidyr and PCIT
 
 ## 1. Script execution:
-a) Use `sh MinION_MEGAN.sh -h`  
+a) Use `sh MinION_MEGAN.sh -h` for more information.  
 b) Change variable paths inside `MinION_MEGAN.sh`  
-c) Use `sbatch MinION_MEGAN.sh -i` for running the script.  
+c) Use `sbatch MinION_MEGAN.sh [Input_path] [Output_path] -i` for running the script. Other options are available.  
 
 ## 2. Getting trimming and performance statistics:
-Use `sbatch MinION_MEGAN.sh -F`  
-Output: All files will be stored in output directory (`$WDIR`)  
+a) Use `sh MinION_MEGAN_finalstats.sh -h` for more information.
+b) Use `sbatch MinION_MEGAN_finalstats.sh [Project_dir]`for running the script.  
+c) Output: All files will be stored in the specified project directory (normally the `[Output_path]` used for `MinION_MEGAN.sh` run).  
 - `Minion_trim.tsv` -> Trimming summary
 - `Minion_dmnd.tsv` -> Running times for DIAMOND
 - `Minion_megan.tsv` -> Running times for MEGAN
