@@ -21,6 +21,15 @@ module load perl
 perl $PRINSEQDIR/prinseq-lite.pl -fastq $WDIR/1_Rawdata/$1.fastq -min_qual_mean 7 -min_len 300 \
 	-out_good $WDIR/1_Rawdata/$1"_trim" -out_bad $WDIR/1_Rawdata/trim_bad/$1"_bad" -log $WDIR/1_Rawdata/trim_logs/$1.log
 
+# After trimming, remove temp .fastq file and symlink:
+if [ -f $WDIR/1_Rawdata/$1"_trim".fastq ]; then
+	if [ -f $PTH_data/$1.fastq ]; then rm $PTH_data/$1.fastq; fi
+	if [ -f $WDIR/1_Rawdata/$1.fastq ]; then rm $WDIR/1_Rawdata/$1.fastq; fi
+	if [ -d $PTH_data ]; then rmdir $PTH_data; fi
+else
+	echo "TRIMMING ERROR"
+fi
+
 ####################################################################
 # DIAMOND for .fastq to .daa converting 
 ####################################################################
