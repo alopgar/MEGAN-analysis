@@ -1,9 +1,40 @@
 #!/bin/bash
-#SBATCH -t 01:00:00
+#SBATCH -t 00:10:00
+
+usage(){
+cat << _EUs_
+$(basename "$0") [PATH] -- Enables the use of .log files for creating final stats files.\n
+\nDESCRIPTION:\n
+	This script uses information on logs from DIAMOND + MEGAN analysis of Nanopore MinION data made by MinION_MEGAN.sh, and creates stat files to get\n
+	information about runs.\n
+	\t-Trimming stats (Prinseq-lite)\n
+	\t-Running time for DIAMOND files\n
+	\t-Running time for MEGAN files\n
+\nPATH:\n
+	Mandatory argument -> Project working directory where MinION_MEGAN.sh results are stored.\n
+\nPARAMETERS:\n
+	-h, --help:\n
+	\tPrints this screen.\n
+_EUs_
+}
+
+OPTS=`getopt -o h --long help -- "$@"`
+eval set -- "$OPTS"
+
+while true; do
+	case $1 in
+		-h | --help)
+			echo -e $(usage) | less ; exit ;;
+		--) shift ; break ;;
+        *) echo "Internal error!" ; exit 1 ;;
+	esac
+done
 
 ####################################################
 ## FINAL STATS FILES
 ####################################################
+WDIR=$1
+
 ## STATS FOR TRIMMING WITH PRINSEQ-LITE:
 for i in $(ls $WDIR/1_Rawdata/trim_logs/*.log); do
 	echo $i | xargs -n1 basename > Trimcol.tmp
