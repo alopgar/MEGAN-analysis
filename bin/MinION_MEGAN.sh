@@ -106,5 +106,5 @@ if [ ! -d $WDIR/4_files.rmainfo ];then mkdir $WDIR/4_files.rmainfo; fi
 
 ## EXE:
 for file in $Input; do
-	sh ./bin/MinION_MEGAN/MinION_MEGAN_run.sh $file
+	sbatch MinION_MEGAN_run.sh $file
 done
