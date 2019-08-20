@@ -64,7 +64,7 @@ fi
 if [ $proc == "PDM" ] || [ $proc == "DM" ] || [ $proc == "M" ]; then
 	#Converts rma file into a readable file with taxonomy and number of reads per taxon.
 	$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -c2c Taxonomy -p -r -mro > $WDIR/4_files.rmainfo/$1"_trim.rma.RA.txt"
+	$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -r2c Taxonomy -p -r -mro > $WDIR/4_files.rmainfo/$1"_trim.rma.readtotax.txt"
 	#Converts rma file into a readable file with Interpro2go functional info per read (2nd line is for taxonomy of each read)
 	$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -r2c INTERPRO2GO -p > $WDIR/4_files.rmainfo/$1"_trim.rma.IP2G.txt"
-	$MEGANDIR/tools/rma2info -i $WDIR/3_files.rma/$1"_trim.rma" -r2c Taxonomy -p -r -mro > $WDIR/4_files.rmainfo/$1"_trim.rma.readtotax.txt"
 fi
