@@ -1,0 +1,22 @@
+####################################################################
+## FINAL IP2G FILE (CAT + JOIN)
+####################################################################
+cat $WDIR/4_files.rmainfo/*.IP2G.txt > $WDIR/5_final.files/rma_ip2g_all.tsv
+
+awk -F '\t' '{print $2}' rma_ip2g_compare1.tsv | awk -F ' ' '{ a[$2]++ } END { for (b in a) { print b } }'
+awk -F'\t' 'FNR==NR {f2[$1];next} !($1 in f2)' rma_ip2g_compare1.tsv rma_ip2g_all.tsv
+
+sort $WDIR/5_final.files/rma_ip2g_all.tsv > $WDIR/5_final.files/rma_ip2g_sorted.tsv
+
+cat $WDIR/4_files.rmainfo/*.readtotax.txt > $WDIR/5_final.files/rma_readtotax.tsv
+sort $WDIR/5_final.files/rma_readtotax.tsv > $WDIR/5_final.files/rma_readtotax_sorted.tsv
+
+join $WDIR/5_final.files/rma_readtotax_sorted.tsv $WDIR/5_final.files/rma_ip2g_sorted.tsv -t $'\t' > $WDIR/5_final.files/rma_funct_join.tsv
+grep -e 'Eukaryota; \[P\]' rma_funct_join.tsv | awk -F '\t' '{ a[$3]++ } END { for (b in a) { print b } }' | \
+awk -F ';' '{ a[$1,$2,$3]++ } END { for (b in a) { print b } }' | sort
+
+awk '!/\[P\] Annelida;|\[P\] Arthropoda;|\[P\] Chordata;|\[P\] Cnidaria;|\[P\] Mollusca;|\[P\] Nematoda;|\[P\] Streptophyta;/' rma_funct_join.tsv > rma_funct_join_filt.tsv
+
+cd $WDIR/5_final.files
+tar -cvzf rma_funct_join_filt.tgz rma_funct_join_filt.tsv
+cd
