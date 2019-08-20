@@ -45,14 +45,14 @@ fi
 # MEGAN for .daa to .rma converting
 ####################################################################
 ##OPTIONS
-## -i				input_file
-## -o				ouput file
-## -a2t				Map alignment against accesion map of the *proteins* for *taxonomy classification* (Mapping files for current NCBI-nr protein database (not containing GI numbers). Protein to taxonomy http://ab.inf.uni-tuebingen.de/data/software/megan6/download/welcome.html)
+## -i			input_file
+## -o			ouput file
+## -a2t			Map alignment against accesion map of the *proteins* for *taxonomy classification* (Mapping files for current NCBI-nr protein database (not containing GI numbers). Protein to taxonomy http://ab.inf.uni-tuebingen.de/data/software/megan6/download/welcome.html)
 ## -a2interpro2go	Alignment from *proteins* to *functional information* (Mapping files for current NCBI-nr protein database (not containing GI numbers). Protein to InterPro http://ab.inf.uni-tuebingen.de/data/software/megan6/download/welcome.html)
-## -lg				Use long reads
-## -alg				Algorithm to use for mapping. Use longReads specific for nanopore
-## -ram				Set the read assignment mode. Default value: readCount. Legal values: readCount, readLength, alignedBases, readMagnitude
-## -ms				Min score. Default value: 50.0.
+## -lg			Use long reads
+## -alg			Algorithm to use for mapping. Use longReads specific for nanopore
+## -ram			Set the read assignment mode. Default value: readCount. Legal values: readCount, readLength, alignedBases, readMagnitude
+## -ms			Min score. Default value: 50.0.
 
 if [ $proc == "PDM" ] || [ $proc == "DM" ] || [ $proc == "M" ]; then
 	$MEGANDIR/tools/daa2rma -i $WDIR/2_files.daa/$1"_trim.daa" -o $WDIR/3_files.rma/$1"_trim.rma" -lg -alg longReads -a2t $MEGAN_a2t -a2interpro2go $MEGAN_ip2g
